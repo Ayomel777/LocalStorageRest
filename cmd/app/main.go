@@ -33,7 +33,7 @@ func main() {
 //curl -X COPY http://localhost:8080/files/hello.txt -H "Destination: /files/backup.txt"
 
 //MOVE
-//curl -X MOVE http://localhost:8080/files/backup.txt -H "Destination: /files/moved.txt"
+//curl.exe -X MOVE http://localhost:8080/files/backup.txt -H "Destination: /files/moved.txt"
 
 //DELETE
 //curl -X DELETE http://localhost:8080/files/hello.txt

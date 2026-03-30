@@ -59,13 +59,18 @@ func (s *Storage) Write(path string, r io.Reader) error {
 		return err
 	}
 	_ = os.MkdirAll(filepath.Dir(abs), 0755)
-	f, err := os.OpenFile(abs, os.O_CREATE|os.O_WRONLY, 0644)
+	//f, err := os.OpenFile(abs, os.O_CREATE|os.O_WRONLY, 0644)
+	//if err != nil {
+	//	log.Printf("Create error: %v", err)
+	//	return err
+	//}
+	//defer f.Close()
+	f, err := os.Create(abs)
 	if err != nil {
 		log.Printf("Create error: %v", err)
 		return err
 	}
 	defer f.Close()
-
 	_, err = io.Copy(f, r)
 	return err
 }
@@ -78,7 +83,7 @@ func (s *Storage) Append(path string, r io.Reader) error {
 	if err = os.MkdirAll(filepath.Dir(abs), 0755); err != nil {
 		return err
 	}
-	f, err := os.OpenFile(abs, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(abs, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
 	if err != nil {
 		return err
 	}
@@ -124,7 +129,7 @@ func (s *Storage) Copy(srcPath, destPath string) error {
 	if err != nil {
 		return err
 	}
-	_, err = io.Copy(fileIn, fileOut)
+	_, err = io.Copy(fileOut, fileIn)
 	return err
 }
 
