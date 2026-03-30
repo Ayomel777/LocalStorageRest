@@ -2,7 +2,6 @@ package handler
 
 import (
 	"Lab3_KSIS/internal/storage"
-	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -22,44 +21,50 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		rc, err := s.storage.Read(path)
 		if err != nil {
-			writeErr(w, err)
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 		defer rc.Close()
 		io.Copy(w, rc)
 
 	case http.MethodPut:
-		writeErr(w, s.storage.Write(path, r.Body))
+		err := s.storage.Write(path, r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 	case http.MethodPost:
-		writeErr(w, s.storage.Append(path, r.Body))
+		err := s.storage.Append(path, r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 	case http.MethodDelete:
-		writeErr(w, s.storage.Delete(path))
+		err := s.storage.Delete(path)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 	case "COPY":
 		dst := strings.TrimPrefix(r.Header.Get("Destination"), "/files/")
-		writeErr(w, s.storage.Copy(path, dst))
+		err := s.storage.Copy(path, dst)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 	case "MOVE":
 		dst := strings.TrimPrefix(r.Header.Get("Destination"), "/files/")
-		writeErr(w, s.storage.Move(path, dst))
+		err := s.storage.Move(path, dst)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func writeErr(w http.ResponseWriter, err error) {
-	if err == nil {
-		return
-	}
-	switch {
-	case errors.Is(err, storage.ErrNotFound):
-		http.Error(w, err.Error(), http.StatusNotFound)
-	case errors.Is(err, storage.ErrBadPath):
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
