@@ -21,22 +21,24 @@ func main() {
 }
 
 //PUT — создать файл
-//curl -X PUT http://localhost:8080/files/hello.txt -d "Hello, World!"
+//curl.exe -X PUT http://localhost:8080/files/hello.txt -d "Hello, World!"
 
+//PUT - проверка на разбитие чанков
+//curl.exe -X PUT --data-binary "@D:\BSUIR\interface.mp4" http://localhost:8080/files/interface.mp4
 //GET — прочитать
-//curl http://localhost:8080/files/hello.txt
+//curl.exe http://localhost:8080/files/hello.txt
 
 //POST — дописать в конец
-//curl -X POST http://localhost:8080/files/hello.txt -d " Appended"
+//curl.exe -X POST http://localhost:8080/files/hello.txt -d " Appended"
 
 //COPY
-//curl -X COPY http://localhost:8080/files/hello.txt -H "Destination: /files/backup.txt"
+//curl.exe -X COPY http://localhost:8080/files/hello.txt -H "Destination: /files/backup.txt"
 
 //MOVE
 //curl.exe -X MOVE http://localhost:8080/files/backup.txt -H "Destination: /files/moved.txt"
 
 //DELETE
-//curl -X DELETE http://localhost:8080/files/hello.txt
+//curl.exe -X DELETE http://localhost:8080/files/hello.txt
 
 //GET когда удалили (404)
-//curl -v http://localhost:8080/files/hello.txt
+//curl.exe -v http://localhost:8080/files/hello.txt

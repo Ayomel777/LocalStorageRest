@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	MaxChunkSize = 32 << 20 //32mb
+	MaxFileSize  = 1 << 30  //1gb
+)
+
 var (
 	ErrBadPath  = errors.New("bad path")
 	ErrNotFound = errors.New("invalid path or file was deleted")
@@ -71,8 +76,32 @@ func (s *Storage) Write(path string, r io.Reader) error {
 		return err
 	}
 	defer f.Close()
-	_, err = io.Copy(f, r)
-	return err
+	// доп таска
+	limitedReader := io.LimitReader(r, MaxFileSize)
+	chunk := make([]byte, MaxChunkSize)
+	var totalBytes int64
+
+	for {
+		n, err := limitedReader.Read(chunk)
+		if n > 0 {
+			_, writeErr := f.Write(chunk[:n])
+			if writeErr != nil {
+				return writeErr
+			}
+			totalBytes += int64(n)
+			log.Printf("Uploading %s: %d bytes written", path, totalBytes)
+		}
+
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Printf("Upload complete: %s (%d bytes)", path, totalBytes)
+	return nil
 }
 
 func (s *Storage) Append(path string, r io.Reader) error {
