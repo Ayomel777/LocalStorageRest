@@ -11,7 +11,7 @@ import (
 
 var (
 	ErrBadPath  = errors.New("bad path")
-	ErrNotFound = errors.New("invalid path")
+	ErrNotFound = errors.New("invalid path or file was deleted")
 )
 
 type Storage struct {
